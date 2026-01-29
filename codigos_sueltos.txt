@@ -1,0 +1,16 @@
+// Código de recuadro desplazable
+@Composable
+private fun DraggableText() {
+    var offsetX by remember { mutableFloatStateOf(0f) }
+    Text(
+        modifier = Modifier
+            .offset { IntOffset(offsetX.roundToInt(), 0) }
+            .draggable(
+                orientation = Orientation.Horizontal,
+                state = rememberDraggableState { delta ->
+                    offsetX += delta
+                }
+            ),
+        text = "Drag me!"
+    )
+}

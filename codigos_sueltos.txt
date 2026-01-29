@@ -1,4 +1,5 @@
 // Código de recuadro desplazable
+// https://developer.android.com/develop/ui/compose/touch-input/pointer-input/drag-swipe-fling?hl=es-419
 @Composable
 private fun DraggableText() {
     var offsetX by remember { mutableFloatStateOf(0f) }

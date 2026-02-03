@@ -237,6 +237,7 @@ fun SubMenuRegion(lugar: Lugar, onVolver: () -> Unit, modifier: Modifier) {
                 )
             }
         }
+        LazyColumn() { }
     }
 }
 

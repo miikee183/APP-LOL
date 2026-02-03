@@ -87,28 +87,41 @@ fun MainApp(modifier: Modifier = Modifier) {
 
     // Si no hay region seleccionada sale el lazyColumn con todas las regiones
     if (regionSeleccionada == null) {
-
-        LazyColumn(
-            // Lo centramos horizontalmente y le añadimos una separación entre botones
-            modifier = modifier.padding(top = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+        Column(
+            modifier = modifier.fillMaxSize().padding(top = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Siempre que añadamos
-            items(regionesLOL) { lugar ->
-                RegionCard(
-                    lugar = lugar,
-                    onClick = {
-                        regionSeleccionada = lugar
-                        Toast.makeText(context, "Entrando en ${lugar.nombre}", Toast.LENGTH_SHORT).show()
-                    }
+            Image(
+                painter = painterResource(id = R.drawable.titulo),
+                contentDescription = null,
                 )
+            LazyColumn(
+                // Lo centramos horizontalmente y le añadimos una separación entre botones
+                modifier = modifier.padding(top = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Siempre que añadamos
+                items(regionesLOL) { lugar ->
+                    RegionCard(
+                        lugar = lugar,
+                        onClick = {
+                            regionSeleccionada = lugar
+                            Toast.makeText(
+                                context,
+                                "Entrando en ${lugar.nombre}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    )
+                }
             }
         }
         // Si si hay region seleccionada sale el menú de la región
     } else {
         SubMenuRegion(
             lugar = regionSeleccionada!!,
-            onVolver = { regionSeleccionada = null }
+            onVolver = { regionSeleccionada = null },
+            modifier = modifier
         )
     }
 }
@@ -159,7 +172,7 @@ fun RegionCard(
 
 
 @Composable
-fun SubMenuRegion(lugar: Lugar, onVolver: () -> Unit) {
+fun SubMenuRegion(lugar: Lugar, onVolver: () -> Unit, modifier: Modifier) {
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = lugar.imagenResId),
@@ -171,27 +184,58 @@ fun SubMenuRegion(lugar: Lugar, onVolver: () -> Unit) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.4f))
+                .background(Color.Black.copy(alpha = 0.6f))
         )
+    }
+    Button(
+        onClick = onVolver,
+        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+
+    ) {
+        Text(text = "<---", color = Color.Black)
     }
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = lugar.nombre,
-            color = Color.White,
-            fontSize = 45.sp,
-            fontFamily = FontFamily.Monospace,
-            fontWeight = FontWeight.Bold
+        Image(
+            painter = painterResource(id = R.drawable.titulo),
+            contentDescription = null,
         )
-
-        Button(
-            onClick = onVolver,
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+        Card(
+            modifier = modifier
+                .padding(16.dp)
+                .fillMaxWidth(0.9f)
+                .height(10.dp),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
-            Text(text = "Volver", color = Color.White)
+            Box(modifier = Modifier.fillMaxSize()) {
+                Image(
+                    painter = painterResource(id = lugar.imagenResId),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.3f))
+                )
+
+                Text(
+                    text = lugar.nombre,
+                    color = Color.White,
+                    fontSize = 40.sp,
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .border(2.dp, Color.White, RectangleShape)
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            }
         }
     }
 }

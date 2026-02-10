@@ -1,0 +1,38 @@
+package com.example.samuelramonmiguel_mycity.data
+
+import androidx.annotation.DrawableRes
+
+data class Regiones(
+    val nombre: String,
+    @DrawableRes val imagenResId: Int
+)
+
+data class InfoRegion(
+    val region: String,
+    val info: String,
+    val gobierno: String,
+    val magia: String,
+    val tecnologia: String,
+    val Entorno: String,
+    val infoExtra: ArrayList<InfoExtra>,
+    val cancionResId: Int? = null
+)
+
+data class InfoExtra(
+    val titulo: String,
+    @DrawableRes val imagenResId: Int,
+    val infoProfunda: ArrayList<InfoProfunda>
+)
+
+data class InfoProfunda(
+    val titulo: String,
+    val info: String,
+    @DrawableRes val imagenResId: Int,
+)
+
+data class Campeon(
+    val nombre: String,
+    val region: String,
+    @DrawableRes val imagenResId: Int,
+    val bio: String
+)

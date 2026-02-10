@@ -1,0 +1,567 @@
+package com.example.samuelramonmiguel_mycity
+
+import android.media.MediaPlayer
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.samuelramonmiguel_mycity.data.Datasource
+import com.example.samuelramonmiguel_mycity.data.InfoExtra
+import com.example.samuelramonmiguel_mycity.data.InfoRegion
+import com.example.samuelramonmiguel_mycity.data.Regiones
+import com.example.samuelramonmiguel_mycity.data.Campeon
+
+import com.example.samuelramonmiguel_mycity.ui.theme.SamuelRamonMiguelMyCityTheme
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent {
+            SamuelRamonMiguelMyCityTheme {
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    Box(modifier = Modifier.padding(innerPadding)) {
+                        Image(
+                            painter = painterResource(id = R.drawable.fondo),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                        Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.75f)))
+                        MainApp(modifier = Modifier.fillMaxSize())
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MainApp(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    var currentMediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
+
+    // Datos de la carpeta Data
+    val datasource = Datasource()
+    val listaRegiones = datasource.regiones
+    val listaCampeones = datasource.campeones
+
+    // Estados de selección
+    var regionSeleccionada by remember { mutableStateOf<Regiones?>(null) }
+    var infoExtraSeleccionada by remember { mutableStateOf<InfoExtra?>(null) }
+    var campeonSeleccionado by remember { mutableStateOf<Campeon?>(null) }
+
+    // Función para reproducir música
+    fun playMusic(audioResource: Int) {
+        currentMediaPlayer?.apply {
+            stop()
+            release()
+        }
+        currentMediaPlayer = MediaPlayer.create(context, audioResource).apply {
+            isLooping = true
+            start()
+        }
+    }
+
+    // Reproducir música de fondo al iniciar (puedes crear un archivo R.raw.menu_principal)
+    LaunchedEffect(Unit) {
+        // Cambia R.raw.menu_principal por el recurso de audio que quieras para el menú principal
+        // playMusic(R.raw.menu_principal)
+    }
+
+    // Liberar recursos al cerrar
+    DisposableEffect(Unit) {
+        onDispose {
+            currentMediaPlayer?.apply {
+                stop()
+                release()
+            }
+        }
+    }
+
+    // Si se ha seleccionado un campeón se abre el menú del campeón
+    if (campeonSeleccionado != null) {
+        menuCampeon(
+            campeon = campeonSeleccionado!!,
+            onVolver = {
+                campeonSeleccionado = null
+                // Volver a la música de la región
+                regionSeleccionada?.audioResource?.let { playMusic(it) }
+            }
+        )
+    } else if (infoExtraSeleccionada != null) {
+        PantallaDetalleProfundo(
+            infoExtra = infoExtraSeleccionada!!,
+            onVolver = {
+                infoExtraSeleccionada = null
+                // Volver a la música de la región
+                regionSeleccionada?.audioResource?.let { playMusic(it) }
+            }
+        )
+    } else if (regionSeleccionada != null) {
+        val detallesEncontrados = datasource.infoRegion.find {
+            it.region == regionSeleccionada?.nombre
+        } ?: datasource.infoRegion[0]
+
+        SubMenuRegion(
+            region = regionSeleccionada!!,
+            onVolver = {
+                regionSeleccionada = null
+                // Volver a la música del menú principal
+                // playMusic(R.raw.menu_principal)
+            },
+            infoRegion = detallesEncontrados,
+            onInfoExtraClick = { extra -> infoExtraSeleccionada = extra },
+            listaCampeones = listaCampeones,
+            onCampeonClick = { campeon -> campeonSeleccionado = campeon }
+        )
+    } else {
+        // Pantalla de inicio
+        Column(
+            modifier = modifier.fillMaxSize().padding(top = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.titulo),
+                contentDescription = "Título de la App",
+            )
+            LazyColumn(
+                modifier = Modifier.weight(1f).padding(top = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                items(listaRegiones) { region ->
+                    RegionCard(
+                        region = region,
+                        onClick = {
+                            regionSeleccionada = region
+                            // Reproducir música de la región
+                            region.audioResource?.let { playMusic(it) }
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+
+// Función que llama al menú con la información final
+@Composable
+fun PantallaDetalleProfundo(infoExtra: InfoExtra, onVolver: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF010A13))
+            .padding(16.dp)
+    ) {
+        BotonVolverHextech(onVolver = onVolver)
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            items(infoExtra.infoProfunda) { detalle ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, Color(0xFFC8AA6E).copy(alpha = 0.5f), RoundedCornerShape(8.dp))
+                        .background(Color(0xFF010A13))
+                ) {
+                    Image(
+                        painter = painterResource(id = detalle.imagenResId),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentScale = ContentScale.Crop
+                    )
+
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = detalle.titulo.uppercase(),
+                            color = Color(0xFFC8AA6E),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = FontFamily.Monospace
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = detalle.info,
+                            color = Color.White,
+                            fontSize = 15.sp,
+                            lineHeight = 22.sp,
+                            fontFamily = FontFamily.SansSerif
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SubMenuRegion(
+    region: Regiones,
+    onVolver: () -> Unit,
+    infoRegion: InfoRegion,
+    onInfoExtraClick: (InfoExtra) -> Unit,
+    listaCampeones: List<Campeon>,
+    onCampeonClick: (Campeon) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val campeonesFiltrados = listaCampeones.filter { it.region == region.nombre }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Image(
+            painter = painterResource(id = region.imagenResId),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+        Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)))
+
+        Column(
+            modifier = Modifier.fillMaxSize().padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Box(modifier = Modifier.align(Alignment.Start)) {
+                BotonVolverHextech(onVolver = onVolver)
+            }
+
+            Image(
+                painter = painterResource(id = R.drawable.titulo),
+                contentDescription = null,
+                modifier = Modifier.height(80.dp)
+            )
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                contentPadding = PaddingValues(bottom = 32.dp)
+            ) {
+                item {
+                    Card(
+                        modifier = Modifier
+                            .padding(vertical = 16.dp)
+                            .fillMaxWidth(0.95f)
+                            .animateContentSize()
+                            .clickable { expanded = !expanded },
+                        shape = RoundedCornerShape(16.dp),
+                    ) {
+                        Column(modifier = Modifier.background(Color(0xFF010A13))) {
+                            Box(modifier = Modifier.fillMaxWidth().height(80.dp)) {
+                                Image(
+                                    painter = painterResource(id = region.imagenResId),
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                                Text(
+                                    text = region.nombre,
+                                    color = Color(0xFFC8AA6E),
+                                    fontSize = 25.sp,
+                                    fontFamily = FontFamily.Monospace,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier
+                                        .align(Alignment.Center)
+                                        .border(2.dp, Color(0xFFC8AA6E), RectangleShape)
+                                        .background(Color(0xFF010A13).copy(alpha = 0.8f))
+                                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                                )
+                            }
+                            if (expanded) {
+                                Text(
+                                    text = infoRegion.info,
+                                    color = Color.White,
+                                    modifier = Modifier.padding(16.dp),
+                                    fontSize = 14.sp
+                                )
+                            }
+                        }
+                    }
+                }
+
+                item {
+                    Text(
+                        text = "CAMPEONES DE LA REGIÓN",
+                        color = Color(0xFFC8AA6E),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth(0.95f),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        contentPadding = PaddingValues(bottom = 20.dp)
+                    ) {
+                        items(campeonesFiltrados) { campeon ->
+                            CardCampeon(
+                                campeon = campeon,
+                                onClick = { onCampeonClick(campeon) }
+                            )
+                        }
+                    }
+                }
+
+                item {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth(0.95f)
+                            .border(2.dp, color = Color(0xFFC8AA6E), RectangleShape)
+                            .background(Color(0xFF010A13))
+                            .padding(20.dp)
+                    ) {
+                        Row(modifier = Modifier.fillMaxWidth()) {
+                            DetallesInfo(Modifier.weight(1f), "Gobierno:", infoRegion.gobierno)
+                            DetallesInfo(Modifier.weight(1f), "Actitud respecto a la magia:", infoRegion.magia)
+                        }
+                        Spacer(modifier = Modifier.height(20.dp))
+                        Row(modifier = Modifier.fillMaxWidth()) {
+                            DetallesInfo(Modifier.weight(1f), "Nivel de tecnología:", infoRegion.tecnologia)
+                            DetallesInfo(Modifier.weight(1f), "Entorno general:", infoRegion.Entorno)
+                        }
+                    }
+                }
+
+                // Indicador de música reproduciendo
+                item {
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFFC8AA6E).copy(alpha = 0.3f)
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(0.95f)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "♪",
+                                fontSize = 24.sp,
+                                color = Color.White
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Text(
+                                text = "Reproduciendo música de ${region.nombre}",
+                                fontSize = 14.sp,
+                                color = Color.White
+                            )
+                        }
+                    }
+                }
+
+                items(infoRegion.infoExtra) { extra ->
+                    CardInfoExtra(
+                        infoExtra = extra,
+                        onClick = { onInfoExtraClick(extra) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun RegionCard(region: Regiones, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier.padding(16.dp)
+            .fillMaxWidth(0.9f)
+            .height(200.dp)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Image(
+                painter = painterResource(id = region.imagenResId),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+            Box(
+                modifier = Modifier.fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.4f))
+            )
+            Text(
+                text = region.nombre,
+                color = Color(0xFFC8AA6E),
+                fontSize = 30.sp,
+                fontFamily = FontFamily.Monospace,
+                modifier = Modifier.align(Alignment.Center).border(2.dp, Color(0xFFC8AA6E), RectangleShape).background(Color(0xFF010A13).copy(alpha = 0.8f)).padding(16.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun CardCampeon(campeon: Campeon, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .size(80.dp)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, Color(0xFFC8AA6E))
+    ) {
+        Image(
+            painter = painterResource(id = campeon.imagenResId),
+            contentDescription = campeon.nombre,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+
+@Composable
+fun menuCampeon(campeon: Campeon, onVolver: () -> Unit) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF010A13))
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        item {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
+                BotonVolverHextech(onVolver = onVolver)
+            }
+        }
+        item {
+            Image(
+                painter = painterResource(id = campeon.imagenResId),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .height(250.dp)
+                    .border(2.dp, Color(0xFFC8AA6E)),
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.TopCenter
+            )
+        }
+        item {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = campeon.nombre.uppercase(),
+                    color = Color(0xFFC8AA6E),
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Monospace
+                )
+                Text(
+                    text = "Región: ${campeon.region}",
+                    color = Color(0xFFC8AA6E).copy(alpha = 0.7f),
+                    fontSize = 14.sp
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = campeon.bio,
+                    color = Color.White,
+                    fontSize = 15.sp,
+                    lineHeight = 22.sp,
+                    fontFamily = FontFamily.SansSerif
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun CardInfoExtra(infoExtra: InfoExtra, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier.padding(vertical = 8.dp)
+            .fillMaxWidth(0.95f)
+            .height(100.dp)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Image(
+                painter = painterResource(id = infoExtra.imagenResId),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+            Box(
+                modifier = Modifier.fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.4f))
+            )
+            Text(
+                text = infoExtra.titulo.uppercase(),
+                color = Color(0xFFC8AA6E),
+                fontSize = 18.sp,
+                fontFamily = FontFamily.Monospace,
+                modifier = Modifier.align(Alignment.Center).border(1.dp, Color(0xFFC8AA6E), RectangleShape).background(Color(0xFF010A13).copy(alpha = 0.8f)).padding(8.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun BotonVolverHextech(onVolver: () -> Unit) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.size(60.dp)
+            .clickable(onClick = onVolver)
+    ) {
+        Box(
+            modifier = Modifier.size(42.dp)
+                .rotate(45f)
+                .background(Color(0xFF1E2328))
+                .border(1.dp, Color(0xFFC8AA6E))
+        )
+        Box(
+            modifier = Modifier.size(34.dp)
+                .background(Color(0xFF010A13), CircleShape)
+                .border(1.dp, Color(0xFFC8AA6E).copy(alpha = 0.5f), CircleShape)
+        )
+        Text(
+            text = "<",
+            color = Color(0xFFC8AA6E),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.ExtraBold
+        )
+    }
+}
+
+@Composable
+fun DetallesInfo(modifier: Modifier, label: String, value: String) {
+    Column(modifier = modifier) {
+        Text(
+            text = label,
+            color = Color(0xFFC8AA6E).copy(alpha = 0.7f),
+            fontSize = 13.sp
+        )
+        Text(
+            text = value.uppercase(),
+            color = Color(0xFFC8AA6E),
+            fontSize = 15.sp,
+            fontWeight = FontWeight.ExtraBold,
+            fontFamily = FontFamily.Monospace
+        )
+    }
+}

@@ -27,5 +27,11 @@ data class InfoProfunda(
     val titulo: String,
     val info: String,
     @DrawableRes val imagenResId: Int,
+)
 
+data class Campeon(
+    val nombre: String,
+    val region: String,
+    @DrawableRes val imagenResId: Int,
+    val bio: String
 )

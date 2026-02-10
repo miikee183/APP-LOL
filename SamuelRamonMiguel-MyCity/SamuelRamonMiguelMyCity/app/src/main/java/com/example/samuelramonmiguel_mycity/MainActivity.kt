@@ -1,17 +1,18 @@
 package com.example.samuelramonmiguel_mycity
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,7 +24,6 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -33,6 +33,8 @@ import com.example.samuelramonmiguel_mycity.data.Datasource
 import com.example.samuelramonmiguel_mycity.data.InfoExtra
 import com.example.samuelramonmiguel_mycity.data.InfoRegion
 import com.example.samuelramonmiguel_mycity.data.Regiones
+import com.example.samuelramonmiguel_mycity.data.Campeon
+
 import com.example.samuelramonmiguel_mycity.ui.theme.SamuelRamonMiguelMyCityTheme
 
 class MainActivity : ComponentActivity() {
@@ -41,7 +43,6 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SamuelRamonMiguelMyCityTheme {
-                // Fondo inicial
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Box(modifier = Modifier.padding(innerPadding)) {
                         Image(
@@ -51,7 +52,6 @@ class MainActivity : ComponentActivity() {
                             contentScale = ContentScale.Crop
                         )
                         Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.75f)))
-                        // Función inicial
                         MainApp(modifier = Modifier.fillMaxSize())
                     }
                 }
@@ -64,16 +64,43 @@ class MainActivity : ComponentActivity() {
 fun MainApp(modifier: Modifier = Modifier) {
     // Datos de la carpeta Data
     val datasource = Datasource()
-    // Lista de las regiones
     val listaRegiones = datasource.regiones
+    val listaCampeones = datasource.campeones // Asumo que están en tu datasource
 
-    // Estados de si esta seleccionado un botón de región y el otro de info final
+    // Estados de selección
     var regionSeleccionada by remember { mutableStateOf<Regiones?>(null) }
     var infoExtraSeleccionada by remember { mutableStateOf<InfoExtra?>(null) }
+    var campeonSeleccionado by remember { mutableStateOf<Campeon?>(null) }
 
-    // Si no hay nada seleccionado muestra el menú inicial
-    if (regionSeleccionada == null) {
-        // Column con la imagen del juego y un lazy Column con los botones
+    // Si se ha seleccionado un campeón se abre el menú del campeón
+    if (campeonSeleccionado != null) {
+        menuCampeon(
+            campeon = campeonSeleccionado!!,
+            onVolver = { campeonSeleccionado = null }
+        )
+        // Si se ha seleccionado un botón de info extra se abre el menú de info extra
+    } else if (infoExtraSeleccionada != null) {
+        PantallaDetalleProfundo(
+            infoExtra = infoExtraSeleccionada!!,
+            onVolver = { infoExtraSeleccionada = null }
+        )
+        // Si se ha seleccionado una región se abre el menú de la región
+    } else if (regionSeleccionada != null) {
+        val detallesEncontrados = datasource.infoRegion.find {
+            it.region == regionSeleccionada?.nombre
+        } ?: datasource.infoRegion[0]
+
+        SubMenuRegion(
+            region = regionSeleccionada!!,
+            onVolver = { regionSeleccionada = null },
+            infoRegion = detallesEncontrados,
+            onInfoExtraClick = { extra -> infoExtraSeleccionada = extra },
+            listaCampeones = listaCampeones,
+            onCampeonClick = { campeon -> campeonSeleccionado = campeon }
+        )
+        // Si no hay nada seleccionado esta el menú principal
+    } else {
+        // Pantalla de inicio
         Column(
             modifier = modifier.fillMaxSize().padding(top = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -82,7 +109,6 @@ fun MainApp(modifier: Modifier = Modifier) {
                 painter = painterResource(id = R.drawable.titulo),
                 contentDescription = "Título de la App",
             )
-            // Botones de las regiones que llaman a la funcion que genera las cartas
             LazyColumn(
                 modifier = Modifier.weight(1f).padding(top = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -92,26 +118,6 @@ fun MainApp(modifier: Modifier = Modifier) {
                 }
             }
         }
-        // Si hay botón seleccionado dentro de un submenú llama a la función de mostrar info final
-    } else if (infoExtraSeleccionada != null) {
-        // Función de info final
-        PantallaDetalleProfundo(
-            infoExtra = infoExtraSeleccionada!!,
-            onVolver = { infoExtraSeleccionada = null }
-        )
-        // Si hay seleccionado un botón del menú inicial pero no de submenú
-    } else {
-        // Busca los detalles de la primera región encontrada con el mismo nombre de la región seleccionada
-        val detallesEncontrados = datasource.infoRegion.find {
-            it.region == regionSeleccionada?.nombre
-        } ?: datasource.infoRegion[0]
-        // Llamamos a la función del submenú con la región seleccionada
-        SubMenuRegion(
-            region = regionSeleccionada!!,
-            onVolver = { regionSeleccionada = null },
-            infoRegion = detallesEncontrados,
-            onInfoExtraClick = { extra -> infoExtraSeleccionada = extra }
-        )
     }
 }
 // Función que llama al menú con la información final
@@ -172,16 +178,21 @@ fun PantallaDetalleProfundo(infoExtra: InfoExtra, onVolver: () -> Unit) {
         }
     }
 }
-// Función del submenú
+// Función del submenú de cada región
 @Composable
 fun SubMenuRegion(
     region: Regiones,
     onVolver: () -> Unit,
     infoRegion: InfoRegion,
-    onInfoExtraClick: (InfoExtra) -> Unit
+    onInfoExtraClick: (InfoExtra) -> Unit,
+    listaCampeones: List<Campeon>,
+    onCampeonClick: (Campeon) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    // Fondo con la imagen de la region seleccionada
+
+    // Filtrar campeones que pertenecen a esta región
+    val campeonesFiltrados = listaCampeones.filter { it.region == region.nombre }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             painter = painterResource(id = region.imagenResId),
@@ -189,9 +200,8 @@ fun SubMenuRegion(
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-        // Oscurecemos la imagen
         Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.6f)))
-        // Column con el botón de volver personalizado la imagen del título del lol y un lazyColumn
+
         Column(
             modifier = Modifier.fillMaxSize().padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -211,14 +221,14 @@ fun SubMenuRegion(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 contentPadding = PaddingValues(bottom = 32.dp)
             ) {
-                // El primer item es una card que tiene el titulo y la imagen de la region seleccionada
+                // Card de la Región
                 item {
                     Card(
                         modifier = Modifier
                             .padding(vertical = 16.dp)
                             .fillMaxWidth(0.95f)
                             .animateContentSize()
-                            // Si la clickeas se expande
+                            // Si clickeas se expande la tarjeta
                             .clickable { expanded = !expanded },
                         shape = RoundedCornerShape(16.dp),
                     ) {
@@ -243,7 +253,7 @@ fun SubMenuRegion(
                                         .padding(horizontal = 16.dp, vertical = 8.dp)
                                 )
                             }
-                            // Si esta expandida se muestra la info
+                            // Si esta expandida se ve la info
                             if (expanded) {
                                 Text(
                                     text = infoRegion.info,
@@ -255,7 +265,32 @@ fun SubMenuRegion(
                         }
                     }
                 }
-                // El siguiente item era un column con 2 row que muestra info importante de la region
+
+                // LazyRow de Campeones filtrados
+                item {
+                    Text(
+                        text = "CAMPEONES DE LA REGIÓN",
+                        color = Color(0xFFC8AA6E),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth(0.95f),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        contentPadding = PaddingValues(bottom = 20.dp)
+                    ) {
+                        items(campeonesFiltrados) { campeon ->
+                            CardCampeon(
+                                campeon = campeon,
+                                // Si clickeas te mete al menú del campeón
+                                onClick = { onCampeonClick(campeon) }
+                            )
+                        }
+                    }
+                }
+
+                // Detalles de la región
                 item {
                     Column(
                         modifier = Modifier
@@ -263,23 +298,25 @@ fun SubMenuRegion(
                             .border(2.dp, color= Color(0xFFC8AA6E), RectangleShape)
                             .background(Color(0xFF010A13))
                             .padding(20.dp)
+                        // Llama a la función de destalles
                     ) {
-                        // Los 2 row llaman a una función que es para escribir los detalles de la info
                         Row(modifier = Modifier.fillMaxWidth()) {
                             DetallesInfo(Modifier.weight(1f), "Gobierno:", infoRegion.gobierno)
-                            DetallesInfo(Modifier.weight(1f), "Magia:", infoRegion.magia)
+                            DetallesInfo(Modifier.weight(1f), "Actitud respecto a la magia::", infoRegion.magia)
                         }
                         Spacer(modifier = Modifier.height(20.dp))
                         Row(modifier = Modifier.fillMaxWidth()) {
-                            DetallesInfo(Modifier.weight(1f), "Tecnología:", infoRegion.tecnologia)
-                            DetallesInfo(Modifier.weight(1f), "Entorno:", infoRegion.Entorno)
+                            DetallesInfo(Modifier.weight(1f), "Nivel de tecnología:", infoRegion.tecnologia)
+                            DetallesInfo(Modifier.weight(1f), "Entorno general:", infoRegion.Entorno)
                         }
                     }
                 }
-                // Por último son todos los botones de info más profunda de la región
+
+                // Botones de info extra
                 items(infoRegion.infoExtra) { extra ->
                     CardInfoExtra(
                         infoExtra = extra,
+                        // Si se clickea entras al menú de info extra
                         onClick = { onInfoExtraClick(extra) }
                     )
                 }
@@ -292,7 +329,11 @@ fun SubMenuRegion(
 fun RegionCard(region: Regiones, onClick: () -> Unit) {
     // Simplemente una card con un titulo y una imagen y que sea clickeable
     Card(
-        modifier = Modifier.padding(16.dp).fillMaxWidth(0.9f).height(200.dp).clickable(onClick = onClick),
+        modifier = Modifier.padding(16.dp)
+            .fillMaxWidth(0.9f)
+            .height(200.dp)
+            // Si lo clickeas entras al submenú de la región
+            .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -313,6 +354,80 @@ fun RegionCard(region: Regiones, onClick: () -> Unit) {
                 fontFamily = FontFamily.Monospace,
                 modifier = Modifier.align(Alignment.Center).border(2.dp, Color(0xFFC8AA6E), RectangleShape).background(Color(0xFF010A13).copy(alpha = 0.8f)).padding(16.dp)
             )
+        }
+    }
+}
+// Función de las tarjetas de los campeones
+@Composable
+fun CardCampeon(campeon: Campeon, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .size(80.dp)
+            // Si lo clickeas se mete al menú del campeón
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, Color(0xFFC8AA6E))
+    ) {
+        Image(
+            painter = painterResource(id = campeon.imagenResId),
+            contentDescription = campeon.nombre,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+// Menú que sale cuando le das a un campeón
+@Composable
+fun menuCampeon(campeon: Campeon, onVolver: () -> Unit) {
+    // Usamos LazyColumn para que al estar horizontal el móvil se pueda ver todo
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF010A13))
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        item {
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
+                BotonVolverHextech(onVolver = onVolver)
+            }
+        }
+        item {
+            Image(
+                painter = painterResource(id = campeon.imagenResId),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .height(250.dp)
+                    .border(2.dp, Color(0xFFC8AA6E)),
+                contentScale = ContentScale.Crop,
+                alignment = Alignment.TopCenter
+            )
+        }
+        item {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = campeon.nombre.uppercase(),
+                    color = Color(0xFFC8AA6E),
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = FontFamily.Monospace
+                )
+                Text(
+                    text = "Región: ${campeon.region}",
+                    color = Color(0xFFC8AA6E).copy(alpha = 0.7f),
+                    fontSize = 14.sp
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = campeon.bio,
+                    color = Color.White,
+                    fontSize = 15.sp,
+                    lineHeight = 22.sp,
+                    fontFamily = FontFamily.SansSerif
+                )
+            }
         }
     }
 }

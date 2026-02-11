@@ -6,20 +6,22 @@ import com.example.samuelramonmiguel_mycity.R
 
 class Datasource() {
     var regiones = listOf<Regiones>(
-        Regiones("Noxus", R.drawable.noxus),
-        Regiones("Demacia", R.drawable.demacia),
-        Regiones("Jonia", R.drawable.jonia),
-        Regiones("Freljord", R.drawable.freljord),
-        Regiones("Shurima", R.drawable.shurima),
-        Regiones("Targon", R.drawable.targon),
-        Regiones("Ixtal", R.drawable.ixtal),
-        Regiones("Piltover", R.drawable.piltover),
-        Regiones("Zaun", R.drawable.zaun),
-        Regiones("El Vacío", R.drawable.vacio),
-        Regiones("Ciudad Bandle", R.drawable.bandle),
-        Regiones("Isla de sombras", R.drawable.islasombras),
-        Regiones("Aguas estancadas", R.drawable.aguasestancadas)
+        Regiones("Noxus", R.drawable.noxus, R.raw.noxus_m),
+        Regiones("Demacia", R.drawable.demacia, R.raw.demacia_m),
+        Regiones("Jonia", R.drawable.jonia, R.raw.jonia_m),
+        Regiones("Freljord", R.drawable.freljord, R.raw.frellyord),
+        Regiones("Shurima", R.drawable.shurima, R.raw.shurima_m),
+        Regiones("Targon", R.drawable.targon, R.raw.thargon),
+        Regiones("Ixtal", R.drawable.ixtal, R.raw.ixtal),
+        Regiones("Piltover", R.drawable.piltover, R.raw.pilltover_m),
+        Regiones("Zaun", R.drawable.zaun, R.raw.zaun_m),
+        Regiones("El Vacío", R.drawable.vacio, R.raw.vacio_m),
+        Regiones("Ciudad Bandle", R.drawable.bandle, R.raw.bandle_m),
+        Regiones("Isla de sombras", R.drawable.islasombras, R.raw.islas_de_las_sombras_m),
+        Regiones("Aguas estancadas", R.drawable.aguasestancadas, R.raw.aguas_estancadas_m)
     )
+
+
 
     var campeones = listOf<Campeon>(
         Campeon("Aatrox", "Jonia", R.drawable.aatrox, "Aatrox y sus hermanos, otrora respetados defensores de Shurima contra el Vacío, acabarían convirtiéndose en una amenaza aún mayor para Runaterra y solo conocieron la derrota ante el uso astuto de hechizos mortales. No obstante, tras siglos de reclusión, Aatrox fue el primero en recuperar su libertad y se dedicó a corromper y transformar a cualquier necio que intentase empuñar el arma mágica que contenía su esencia. Ahora, envuelto en carne y huesos que no le pertenecen y que ha transformado en una horrenda aproximación de su antiguo aspecto, recorre Runaterra en busca de la apocalíptica venganza que tanto anhela."),
@@ -194,9 +196,9 @@ class Datasource() {
         Campeon("Zilean", "Ixtal", R.drawable.zilean, "Zilean, el que un día fuera un poderoso mago de Icathia, se obsesionó con el paso del tiempo tras ser testigo de la destrucción de su tierra natal a manos del Vacío. Incapaz de parar un minuto a llorar tan catastrófica pérdida, se entregó a la vetusta magia temporal para descubrir todos los resultados posibles. Tras volverse prácticamente inmortal, Zilean viaja por el pasado, el presente y el futuro, deformando y retorciendo el flujo temporal que lo rodea, siempre en busca del preciso instante al que poder volver para evitar la destrucción de Icathia."),
         Campeon("Zoe", "Targon", R.drawable.zoe, "Como personificación de la travesura, de la imaginación y del cambio, Zoe es la mensajera cósmica de Targon y anuncia acontecimientos importantes que remodelan mundos. Su mera presencia distorsiona las matemáticas arcanas que gobiernan las realidades y a veces provoca cataclismos sin intención ni malicia. Puede que eso explique el aire de indiferencia con el que Zoe aborda sus responsabilidades, lo que le da el tiempo suficiente para dedicarse a jugar, a gastar bromas a los mortales o, simplemente, a divertirse. Un encuentro con Zoe puede ser dichoso y alentador, pero siempre implica más de lo que parece y suele resultar extremadamente peligroso."),
         Campeon("Zyra", "Ixtal", R.drawable.zyra, "Nacida gracias a un fenómeno sobrenatural hace mucho tiempo, Zyra encarna la ira de la naturaleza: un seductor híbrido entre planta y humano que da lugar a nueva vida a cada paso. Ve a los mortales de Valoran como poco más que presas para su progenie, y lo único que busca es matarlos con ráfagas de espinas mortales. Aunque no se ha revelado su verdadero propósito, Zyra deambula por el mundo satisfaciendo sus instintos de colonización y erradicando cualquier otro tipo de vida."),
-        )
+    )
 
-    var infoRegion = listOf<InfoRegion>(
+     var infoRegion = listOf<InfoRegion>(
         InfoRegion("Noxus","Noxus es un salvaje imperio cuya expansión no se detiene. Eso sí, quienes miren más allá de su exterior militarizado descubrirán una sociedad sorprendentemente inclusiva. Todo el mundo puede aspirar a una posición de respeto y poder si demuestra que tiene las aptitudes necesarias, sin importar su estatus social, su pasado o su riqueza. Los noxianos valoran la fuerza por encima de todo lo demás, aunque la fuerza se puede manifestar de modos muy distintos.",
             "Imperio expansionista","Se usa como arma","Medio","Estepa hostil",
             infoExtra = arrayListOf(
@@ -264,25 +266,25 @@ class Datasource() {
             infoExtra = arrayListOf(
                 InfoExtra("La vida de jonia",
                     R.drawable.jonia1_1,infoProfunda = arrayListOf(
-                    InfoProfunda("Las Tierras Primigenias","La magia impregna cada rincón de Jonia, a su gente, su historia y gran parte de sus tierras. Allí todos los aspectos de la vida guardan un equilibrio, y todavía queda muchísimo por explorar y descubrir. Aquellos que llaman hogar a este vasto continente se esfuerzan por encontrar la armonía entre sus distintas razas y habitantes, mucho más antiguas que la mayoría de las de Runaterra.",
-                        R.drawable.jonia1_1),
-                    InfoProfunda("La vida en unidad","Los habitantes de las muchas provincias de Jonia siempre se han considerado parte del entorno natural, y por ello adaptaron su estilo de vida para vivir en armonía con todo tipo de flora y fauna fantástica. A los forasteros les puede sorprender esa relación tan cercana, pero lo cierto es que tanto la tierra como sus pobladores le deben a esta interdependencia el suceder de sus innumerables generaciones.",
-                        R.drawable.jonia1_2),
-                    InfoProfunda("Una historia antigua y respetada","No cabe duda de que la historia de Jonia es una mucho más larga y rica de lo que jamás llegará a conocer ninguna criatura viviente. De hecho, en los desfiladeros de montaña más remotos, el paisaje sigue haciéndose eco de las grandes guerras que se libraron antaño. Los jonios, en vez de limpiar los escombros, decidieron respetar los restos aunque no comprendieran completamente todo lo que representaban.",
-                        R.drawable.jonia1_3),
-                    InfoProfunda("Los grandes monasterios","A pesar de ser la cuna de una amplia variedad de artes marciales especializadas, Jonia no tiene ejército. En su lugar, sus batallas están ligadas a filosofías diferentes, transmitidas con veneración y atención. En las montañas del nordeste, hace ya tiempo que el monasterio de Hirana es el santuario de quienes buscan una mejor comprensión de la conexión con el reino espiritual.",
-                        R.drawable.jonia1_4),
-                    InfoProfunda("Costa mágica","Incluso los mares que rodean Jonia están llenos de vida mágica y en constante evolución.",
-                        R.drawable.jonia1_5),
-                    InfoProfunda("Mercado del bosque","",
-                        R.drawable.jonia1_6),
-                    InfoProfunda("Los cañones arcoíris de Shi","",
-                        R.drawable.jonia1_7),
-                    InfoProfunda("El Luonn-Kon","",
-                        R.drawable.jonia1_8),
-                    InfoProfunda("Lago de lirios encendidos","",
-                        R.drawable.jonia1_9)
-                )),
+                        InfoProfunda("Las Tierras Primigenias","La magia impregna cada rincón de Jonia, a su gente, su historia y gran parte de sus tierras. Allí todos los aspectos de la vida guardan un equilibrio, y todavía queda muchísimo por explorar y descubrir. Aquellos que llaman hogar a este vasto continente se esfuerzan por encontrar la armonía entre sus distintas razas y habitantes, mucho más antiguas que la mayoría de las de Runaterra.",
+                            R.drawable.jonia1_1),
+                        InfoProfunda("La vida en unidad","Los habitantes de las muchas provincias de Jonia siempre se han considerado parte del entorno natural, y por ello adaptaron su estilo de vida para vivir en armonía con todo tipo de flora y fauna fantástica. A los forasteros les puede sorprender esa relación tan cercana, pero lo cierto es que tanto la tierra como sus pobladores le deben a esta interdependencia el suceder de sus innumerables generaciones.",
+                            R.drawable.jonia1_2),
+                        InfoProfunda("Una historia antigua y respetada","No cabe duda de que la historia de Jonia es una mucho más larga y rica de lo que jamás llegará a conocer ninguna criatura viviente. De hecho, en los desfiladeros de montaña más remotos, el paisaje sigue haciéndose eco de las grandes guerras que se libraron antaño. Los jonios, en vez de limpiar los escombros, decidieron respetar los restos aunque no comprendieran completamente todo lo que representaban.",
+                            R.drawable.jonia1_3),
+                        InfoProfunda("Los grandes monasterios","A pesar de ser la cuna de una amplia variedad de artes marciales especializadas, Jonia no tiene ejército. En su lugar, sus batallas están ligadas a filosofías diferentes, transmitidas con veneración y atención. En las montañas del nordeste, hace ya tiempo que el monasterio de Hirana es el santuario de quienes buscan una mejor comprensión de la conexión con el reino espiritual.",
+                            R.drawable.jonia1_4),
+                        InfoProfunda("Costa mágica","Incluso los mares que rodean Jonia están llenos de vida mágica y en constante evolución.",
+                            R.drawable.jonia1_5),
+                        InfoProfunda("Mercado del bosque","",
+                            R.drawable.jonia1_6),
+                        InfoProfunda("Los cañones arcoíris de Shi","",
+                            R.drawable.jonia1_7),
+                        InfoProfunda("El Luonn-Kon","",
+                            R.drawable.jonia1_8),
+                        InfoProfunda("Lago de lirios encendidos","",
+                            R.drawable.jonia1_9)
+                    )),
                 InfoExtra("Diversidad de paisajes", R.drawable.jonia2_1,infoProfunda = arrayListOf(
                     InfoProfunda("Mercado","",
                         R.drawable.jonia2_1),
@@ -324,7 +326,7 @@ class Datasource() {
                         R.drawable.jonia4_3),
                     InfoProfunda("Vastaya","",
                         R.drawable.jonia4_4)
-                    )),
+                )),
                 InfoExtra("Accesorios diarios", R.drawable.jonia5_1,infoProfunda = arrayListOf(
                     InfoProfunda("Herramientas agrícola","",
                         R.drawable.jonia5_1),
@@ -332,7 +334,7 @@ class Datasource() {
                         R.drawable.jonia5_2),
                     InfoProfunda("Instrumentos jonios","",
                         R.drawable.jonia5_3)
-                    ))
+                ))
                         cancionResId = R.raw.jonia_m
             )),
         InfoRegion("Freljord","Freljord es una región fría e inmisericorde donde los semidioses campan a sus anchas y las personas nacen guerreras. Aunque hay muchas tribus individuales, las tres más grandes son los avarosanos, la Garra Invernal y la Guardia de Hielo, todas movidas por su afán de supervivencia. Además, es el único sitio de Runaterra en el que se puede hallar Hielo Puro.",
@@ -353,7 +355,7 @@ class Datasource() {
                         R.drawable.freljord1_6),
                     InfoProfunda("Arquitectura freljordiana","",
                         R.drawable.freljord1_7)
-                    )),
+                )),
                 InfoExtra("Las tribus", R.drawable.freljord2_1,infoProfunda = arrayListOf(
                     InfoProfunda("Gente de las tribus","",
                         R.drawable.freljord2_1),
@@ -363,7 +365,7 @@ class Datasource() {
                         R.drawable.freljord2_3),
                     InfoProfunda("La Guardia de Hielo","La Guardia de Hielo es un culto rodeado de misterio. Moran entre las antiguas ruinas del extremo norte y viven para proteger a su líder, Lissandra, mientras vela por el Abismo de los Lamentos. Pese a ello, es muy común encontrarse con misioneros y sanadores en todo Freljord.",
                         R.drawable.freljord2_4)
-                    )),
+                )),
                 InfoExtra("Hielo Puro", R.drawable.freljord3_1,infoProfunda = arrayListOf(
                     InfoProfunda("Armamento tribal","Las espadas y los arcos de las tribus se fabrican principalmente con madera, acero y hueso, pero en casos excepcionales, pueden utilizar Hielo Puro.",
                         R.drawable.freljord3_1),
@@ -386,7 +388,7 @@ class Datasource() {
                         R.drawable.shurima1_4),
                     InfoProfunda("Saqueadores","Los saqueadores de Shurima no sobreviven gracias al comercio, sino a la violencia. Estas bandas de maleantes a menudo intentan entremezclarse con el entorno para atraer a los viajeros ingenuos hacia sus trampas antes de matarlos, quitarles sus pertenencias y, en casos excepcionales, comérselos.",
                         R.drawable.shurima1_5)
-                    ))
+                ))
                         cancionResId = R.raw.shurima_m
             )),
         InfoRegion("Targon","Targon, una región montañosa y de escasa población al oeste de Shurima, presume de tener el pico más alto de Runaterra. Lejos de la civilización, la ubicación del monte Targon es prácticamente imposible de encontrar para todos salvo para los peregrinos con más determinación, que ansían con toda su alma alcanzar la cima. Los poquísimos que sobreviven al ascenso vuelven atormentados y vacíos, o experimentan un cambio que los vuelve irreconocibles.",
@@ -415,7 +417,7 @@ class Datasource() {
                         R.drawable.targon2_1),
                     InfoProfunda("Los guerreros","Los sacerdotes rakkoranos enseñan que, cuando su sol sea destruido, todo se sumirá en la oscuridad. Por ello, los guerreros deben estar preparados para luchar contra aquellos que buscan extinguir su luz. La batalla es un acto de devoción para los rakkoranos, una ofrenda para que la luz del sol siga resplandeciendo.",
                         R.drawable.targon2_2)
-                    )),
+                )),
                 InfoExtra("Los Solari", R.drawable.targon3_1,infoProfunda = arrayListOf(
                     InfoProfunda("Los Solari","Los Solari, el grupo religioso dominante en el Monte Targon, creen que el sol es la fuente de toda vida. Para ellos, todas las otras fuentes de luz son falsas y suponen una amenaza para el futuro de su gente. El templo de los Solari se encuentra en las laderas del Monte Targon, donde se enseña a los discípulos las escrituras de su fe. Sus guerreros templarios, los Ra'Horak, entrenan durante años en durísimas condiciones para poder defender la tierra contra ejércitos invasores y ejecutar herejes con justicia divina.",
                         R.drawable.targon3_1),
@@ -462,7 +464,7 @@ class Datasource() {
                         R.drawable.ixtal1_4),
                     InfoProfunda("Los dragones elementales","Sorprendentemente, las ruinas abandonadas que se esparcen por Ixtal son hogar de una gran cantidad de dragones. Estas aterradoras criaturas no han luchado junto a los mortales desde el fin de la guerra entre Shurima y el Vacío, y hoy en día parecen disfrutar de su paz y aislamiento.",
                         R.drawable.ixtal1_5)
-                    ))
+                ))
                         cancionResId = R.raw.ixtal
             )),
         InfoRegion("Piltover","Piltover es una próspera ciudad progresista frente al océano. Acoge a flotas enteras de barcos mercantiles que cruzan las gigantes puertas marítimas para traer bienes provenientes del resto del mundo. Los clanes mercantiles aportan los fondos necesarios para empresas increíbles: desde locuras artísticas a monumentos arquitectónicos en honor a su poder individual. Con cada vez más inventores indagando en la hextech, Piltover se ha convertido en el destino para los artesanos más habilidosos de toda Runaterra.",
@@ -477,7 +479,7 @@ class Datasource() {
                         R.drawable.piltover1_3),
                     InfoProfunda("Sellos de los clanes mercantiles","Cada clan mercantil de Piltover tiene su propio sello exclusivo con el que identifica sus casas, talleres, cargamentos, almacenes, inventos, marcas y centros de actividad. Además, cada sello alberga muchísimas acepciones e interpretaciones; algunas evidentes y otras no tanto.",
                         R.drawable.piltover1_4)
-                    )),
+                )),
                 InfoExtra("Una ciudad de expansión", R.drawable.piltover2_1,infoProfunda = arrayListOf(
                     InfoProfunda("Comercio y progreso","La antigua ciudad de Zaun era un punto de comercio de Shurima en el norte, pero la construcción de las puertas marítimas de Piltover más de tres mil años después fue lo que más hizo prosperar el territorio.",
                         R.drawable.piltover2_1),

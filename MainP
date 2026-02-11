@@ -89,10 +89,9 @@ fun MainApp(modifier: Modifier = Modifier) {
         }
     }
 
-    // Reproducir música de fondo al iniciar (puedes crear un archivo R.raw.menu_principal)
+    // Reproducir música de inicio al arrancar (asumiendo que tienes R.raw.rise)
     LaunchedEffect(Unit) {
-        // Cambia R.raw.menu_principal por el recurso de audio que quieras para el menú principal
-        // playMusic(R.raw.menu_principal)
+        playMusic(R.raw.rise)
     }
 
     // Liberar recursos al cerrar
@@ -111,7 +110,7 @@ fun MainApp(modifier: Modifier = Modifier) {
             campeon = campeonSeleccionado!!,
             onVolver = {
                 campeonSeleccionado = null
-                // Volver a la música de la región
+                // Volver a música de la región si hay una seleccionada
                 regionSeleccionada?.audioResource?.let { playMusic(it) }
             }
         )
@@ -120,7 +119,7 @@ fun MainApp(modifier: Modifier = Modifier) {
             infoExtra = infoExtraSeleccionada!!,
             onVolver = {
                 infoExtraSeleccionada = null
-                // Volver a la música de la región
+                // Volver a música de la región
                 regionSeleccionada?.audioResource?.let { playMusic(it) }
             }
         )
@@ -133,8 +132,7 @@ fun MainApp(modifier: Modifier = Modifier) {
             region = regionSeleccionada!!,
             onVolver = {
                 regionSeleccionada = null
-                // Volver a la música del menú principal
-                // playMusic(R.raw.menu_principal)
+                playMusic(R.raw.rise)
             },
             infoRegion = detallesEncontrados,
             onInfoExtraClick = { extra -> infoExtraSeleccionada = extra },
@@ -160,7 +158,6 @@ fun MainApp(modifier: Modifier = Modifier) {
                         region = region,
                         onClick = {
                             regionSeleccionada = region
-                            // Reproducir música de la región
                             region.audioResource?.let { playMusic(it) }
                         }
                     )
@@ -223,6 +220,7 @@ fun PantallaDetalleProfundo(infoExtra: InfoExtra, onVolver: () -> Unit) {
     }
 }
 
+// Función del submenú de cada región
 @Composable
 fun SubMenuRegion(
     region: Regiones,
@@ -331,48 +329,18 @@ fun SubMenuRegion(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth(0.95f)
-                            .border(2.dp, color = Color(0xFFC8AA6E), RectangleShape)
+                            .border(2.dp, color= Color(0xFFC8AA6E), RectangleShape)
                             .background(Color(0xFF010A13))
                             .padding(20.dp)
                     ) {
                         Row(modifier = Modifier.fillMaxWidth()) {
                             DetallesInfo(Modifier.weight(1f), "Gobierno:", infoRegion.gobierno)
-                            DetallesInfo(Modifier.weight(1f), "Actitud respecto a la magia:", infoRegion.magia)
+                            DetallesInfo(Modifier.weight(1f), "Actitud respecto a la magia::", infoRegion.magia)
                         }
                         Spacer(modifier = Modifier.height(20.dp))
                         Row(modifier = Modifier.fillMaxWidth()) {
                             DetallesInfo(Modifier.weight(1f), "Nivel de tecnología:", infoRegion.tecnologia)
                             DetallesInfo(Modifier.weight(1f), "Entorno general:", infoRegion.Entorno)
-                        }
-                    }
-                }
-
-                // Indicador de música reproduciendo
-                item {
-                    Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFFC8AA6E).copy(alpha = 0.3f)
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(0.95f)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "♪",
-                                fontSize = 24.sp,
-                                color = Color.White
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Text(
-                                text = "Reproduciendo música de ${region.nombre}",
-                                fontSize = 14.sp,
-                                color = Color.White
-                            )
                         }
                     }
                 }
@@ -543,8 +511,7 @@ fun BotonVolverHextech(onVolver: () -> Unit) {
             text = "<",
             color = Color(0xFFC8AA6E),
             fontSize = 18.sp,
-            fontWeight = FontWeight.ExtraBold
-        )
+            fontWeight = FontWeight.ExtraBold)
     }
 }
 
